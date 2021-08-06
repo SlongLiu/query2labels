@@ -28,7 +28,7 @@ def get_model_path(modelname):
         Config your pretrained model path here!
     """
     # raise NotImplementedError("Please config your pretrained modelpath!")
-    pretrained_dir = '/data2/liushilong/data/pretrained'
+    pretrained_dir = '/config/to/your/pretrained/model/dir/if/needed'
     PTDICT = {
         'CvT_w24': 'CvT-w24-384x384-IN-22k.pth',
         'swin_L_384_22k': 'swin_large_patch4_window12_384_22k.pth',

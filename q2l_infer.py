@@ -1,5 +1,4 @@
 import argparse
-import math
 import os, sys
 import random
 import datetime
@@ -7,7 +6,6 @@ import time
 from typing import List
 import json
 import numpy as np
-from copy import deepcopy
 
 import torch
 import torch.nn as nn
@@ -51,12 +49,12 @@ def parser_args():
                         choices=['asl'],
                         help='loss functin')
     parser.add_argument('--num_class', default=80, type=int,
-                        help="Number of query slots")
-    parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
-                        help='number of data loading workers (default: 32)')
+                        help="Number of classes.")
+    parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+                        help='number of data loading workers (default: 8)')
     parser.add_argument('-b', '--batch-size', default=16, type=int,
                         metavar='N',
-                        help='mini-batch size (default: 256), this is the total '
+                        help='mini-batch size (default: 16), this is the total '
                             'batch size of all GPUs')
     parser.add_argument('-p', '--print-freq', default=10, type=int,
                         metavar='N', help='print frequency (default: 10)')
@@ -64,7 +62,7 @@ def parser_args():
                         help='path to latest checkpoint (default: none)')
 
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                        help='use pre-trained model. default is False')
+                        help='use pre-trained model. default is False. ')
 
     parser.add_argument('--eps', default=1e-5, type=float,
                     help='eps for focal loss (default: 1e-5)')
@@ -80,10 +78,10 @@ def parser_args():
                         help='seed for initializing training. ')
     parser.add_argument("--local_rank", type=int, help='local rank for DistributedDataParallel')
     parser.add_argument('--amp', action='store_true',
-                        help='use amp.')
+                        help='use mixture precision.')
     # data aug
     parser.add_argument('--orid_norm', action='store_true', default=False,
-                        help='using oridinary norm of 000 and 111. Used for TResNet backbone only')
+                        help='using oridinary norm of [0,0,0] and [1,1,1] for mean and std.')
 
 
     # * Transformer
@@ -102,11 +100,14 @@ def parser_args():
     parser.add_argument('--pre_norm', action='store_true')
     parser.add_argument('--position_embedding', default='sine', type=str, choices=('sine'),
                         help="Type of positional embedding to use on top of the image features")
-    parser.add_argument('--backbone', default='resnet18', type=str,
+    parser.add_argument('--backbone', default='resnet101', type=str,
                         help="Name of the convolutional backbone to use")
-    parser.add_argument('--keep_other_self_attn_dec', action='store_true')
-    parser.add_argument('--keep_first_self_attn_dec', action='store_true')
-    parser.add_argument('--keep_input_proj', action='store_true')
+    parser.add_argument('--keep_other_self_attn_dec', action='store_true', 
+                        help='keep the other self attention modules in transformer decoders, which will be removed default.')
+    parser.add_argument('--keep_first_self_attn_dec', action='store_true',
+                        help='keep the first self attention module in transformer decoders, which will be removed default.')
+    parser.add_argument('--keep_input_proj', action='store_true', 
+                        help="keep the input projection layer. Needed when the channel of image features is different from hidden_dim of Transformer layers.")
     args = parser.parse_args()
 
     # update parameters with pre-defined config file
@@ -296,47 +297,6 @@ def validate(val_loader, model, criterion, args, logger):
 
 
 ##################################################################################
-def add_weight_decay(model, weight_decay=1e-4, skip_list=()):
-    decay = []
-    no_decay = []
-    for name, param in model.named_parameters():
-        if not param.requires_grad:
-            continue  # frozen weights
-        if len(param.shape) == 1 or name.endswith(".bias") or name in skip_list:
-            no_decay.append(param)
-        else:
-            decay.append(param)
-    return [
-        {'params': no_decay, 'weight_decay': 0.},
-        {'params': decay, 'weight_decay': weight_decay}]
-
-class ModelEma(torch.nn.Module):
-    def __init__(self, model, decay=0.9997, device=None):
-        super(ModelEma, self).__init__()
-        # make a copy of the model for accumulating moving average of weights
-        self.module = deepcopy(model)
-        self.module.eval()
-
-        # import ipdb; ipdb.set_trace()
-
-        self.decay = decay
-        self.device = device  # perform ema on different device from model if set
-        if self.device is not None:
-            self.module.to(device=device)
-
-    def _update(self, model, update_fn):
-        with torch.no_grad():
-            for ema_v, model_v in zip(self.module.state_dict().values(), model.state_dict().values()):
-                if self.device is not None:
-                    model_v = model_v.to(device=self.device)
-                ema_v.copy_(update_fn(ema_v, model_v))
-
-    def update(self, model):
-        self._update(model, update_fn=lambda e, m: self.decay * e + (1. - self.decay) * m)
-
-    def set(self, model):
-        self._update(model, update_fn=lambda e, m: m)
-
 
 def _meter_reduce(meter):
     meter_sum = torch.FloatTensor([meter.sum]).cuda()
@@ -383,17 +343,6 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
-class AverageMeterHMS(AverageMeter):
-    """Meter for timer in HH:MM:SS format"""
-    def __str__(self):
-        if self.val_only:
-            fmtstr = '{name} {val}'
-        else:
-            fmtstr = '{name} {val} ({sum})'
-        return fmtstr.format(name=self.name, 
-                             val=str(datetime.timedelta(seconds=int(self.val))), 
-                             sum=str(datetime.timedelta(seconds=int(self.sum))))
-
 class ProgressMeter(object):
     def __init__(self, num_batches, meters, prefix=""):
         self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
@@ -412,6 +361,7 @@ class ProgressMeter(object):
 
 
 def kill_process(filename:str, holdpid:int) -> List[str]:
+    # used for training only.
     import subprocess, signal
     res = subprocess.check_output("ps aux | grep {} | grep -v grep | awk '{{print $2}}'".format(filename), shell=True, cwd="./")
     res = res.decode('utf-8')

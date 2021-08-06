@@ -52,9 +52,9 @@ class Qeruy2Label(nn.Module):
         """[summary]
     
         Args:
-            backbone ([type]): [description]
-            transfomer ([type]): [description]
-            num_class ([type]): [description]
+            backbone ([type]): backbone model.
+            transfomer ([type]): transformer model.
+            num_class ([type]): number of classes. (80 for MSCOCO).
         """
         super().__init__()
         self.backbone = backbone
