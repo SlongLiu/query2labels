@@ -34,6 +34,8 @@ def parser_args():
 
     parser = argparse.ArgumentParser(description='Query2Label for multilabel classification')
     parser.add_argument('--dataname', help='dataname', default='coco14', choices=['coco14'])
+    parser.add_argument('--dataset_dir', help='dir of dataset', default='/comp_robot/liushilong/data/COCO14/')
+    
     parser.add_argument('--img_size', default=448, type=int,
                         help='image size. default(448)')
     parser.add_argument('-a', '--arch', metavar='ARCH', default='Q2L-R101-448',
@@ -207,7 +209,7 @@ def main_worker(args, logger):
             logger.info("=> no checkpoint found at '{}'".format(args.resume))
 
     # Data loading code
-    val_dataset = get_datasets(args)
+    _, val_dataset = get_datasets(args)
     assert args.batch_size // dist.get_world_size() == args.batch_size / dist.get_world_size(), 'Batch size is not divisible by num of gpus.'
     val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset, shuffle=False)
     val_loader = torch.utils.data.DataLoader(

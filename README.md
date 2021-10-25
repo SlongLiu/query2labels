@@ -16,7 +16,6 @@ This paper presents a simple and effective approach to solving the multi-label c
 
 
 # Quick start
-
 0. (optional) Star this repo. 
 
 1. Clone this repo:
@@ -42,33 +41,59 @@ pip install -r requirments.txt
 
 4. Data preparation.
 
-Download [MS-COCO 2014](https://cocodataset.org/#download) and modify the path in ```lib/dataset/cocodataset.py: line 24, 25```.
+Download [MS-COCO 2014](https://cocodataset.org/#download).
 
-5. Download pretrained models.
+5. Train
+```sh
+# single process
+python main_mlc.py \
+--dataset_dir '/path/to/COCO14/' \
+--backbone resnet101 --dataname coco14 --batch-size 64 --print-freq 100 \
+--output "path/to/output" \
+--world-size 1 --rank 0 --dist-url tcp://127.0.0.1:3717 \
+--gamma_pos 0 --gamma_neg 2 --dtgfl \
+--epochs 80 --lr 1e-4 --optim AdamW --pretrained \
+--num_class 80 --img_size 448 --weight-decay 1e-2 \
+--cutout --n_holes 1 --cut_fact 0.5 \
+--hidden_dim 2048 --dim_feedforward 8192 \
+--enc_layers 1 --dec_layers 2 --nheads 4 \
+--early-stop --amp 
 
-You could download pretrained models from [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/). See more details below.
+# single node multi processes
+python -m torch.distributed.launch --nproc_per_node=2 \
+main_mlc.py \
+--dataset_dir '/path/to/COCO14/' \
+--backbone resnet101 --dataname coco14 --batch-size 128 --print-freq 100 \
+--output "path/to/output" \
+--world-size 1 --rank 0 --dist-url tcp://127.0.0.1:3717 \
+--gamma_pos 0 --gamma_neg 2 --dtgfl \
+--epochs 80 --lr 1e-4 --optim AdamW --pretrained \
+--num_class 80 --img_size 448 --weight-decay 1e-2 \
+--cutout --n_holes 1 --cut_fact 0.5 \
+--hidden_dim 2048 --dim_feedforward 8192 \
+--enc_layers 1 --dec_layers 2 --nheads 4 \
+--early-stop --amp 
+```
 
-6. Run!
+
+# Pretrianed Models
+## Download pretrained models.
+|  Modelname   | mAP | link(Tsinghua-cloud)  | 
+|  ----  | ----  | ---- | 
+| Q2L-R101-448  | 84.9 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+| Q2L-R101-576  | 86.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+| Q2L-TResL-448  | 87.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+| Q2L-TResL_22k-448  | 89.2 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+| Q2L-SwinL-384  | 90.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+| Q2L-CvT_w24-384  | 91.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+
+## Test pretrained models
 ```sh
 python q2l_infer.py -a modelname --config /path/to/json/file --resume /path/to/pkl/file [other args]
 e.g.
 python q2l_infer.py -a 'Q2L-R101-448' --config "pretrained/Q2L-R101-448/config_new.json" -b 16 --resume 'pretrained/Q2L-R101-448/checkpoint.pkl'
 ```
 
-# pretrianed model
-
-|  Modelname   | mAP | link(Tsinghua-cloud)  | 
-|  ----  | ----  | ---- | 
-| Q2L-R101-448  | 84.9 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-| Q2L-R101-576  | 86.5 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-| Q2L-TResL-448  | 87.3 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-| Q2L-TResL_22k-448  | 89.2 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-| Q2L-SwinL-384  | 90.5 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-| Q2L-CvT_w24-384  | 91.3 | [this link](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/) |
-
-
-# Training
-Training scripts will be available later. 
 
 
 # BibTex

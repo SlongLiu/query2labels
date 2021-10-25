@@ -37,7 +37,7 @@ class CoCoDataset(data.Dataset):
                 categories = self.getCategoryList(item[1])
                 label = self.getLabelVector(categories)
                 self.labels.append(label)
-            self.save_datalabels()
+            self.save_datalabels(labels_path)
         # import ipdb; ipdb.set_trace()
 
     def __getitem__(self, index):
