@@ -35,6 +35,7 @@ from utils.slconfig import get_raw_dict
 
 
 def parser_args():
+    available_models = ['Q2L-R101-448', 'Q2L-R101-576', 'Q2L-TResL-448', 'Q2L-TResL_22k-448', 'Q2L-SwinL-384', 'Q2L-CvT_w24-384']
     parser = argparse.ArgumentParser(description='Query2Label MSCOCO Training')
     parser.add_argument('--dataname', help='dataname', default='coco14', choices=['coco14'])
     parser.add_argument('--dataset_dir', help='dir of dataset', default='/comp_robot/liushilong/data/COCO14/')
@@ -49,6 +50,10 @@ def parser_args():
                         help='use pre-trained model. default is False. ')
     parser.add_argument('--optim', default='AdamW', type=str, choices=['AdamW', 'Adam_twd'],
                         help='which optim to use')
+    parser.add_argument('-a', '--arch', metavar='ARCH', default='Q2L-R101-448',
+                        choices=available_models,
+                        help='model architecture: ' +' | '.join(available_models) +
+                            ' (default: Q2L-R101-448)')
 
     # loss
     parser.add_argument('--eps', default=1e-5, type=float,
@@ -60,7 +65,9 @@ def parser_args():
     parser.add_argument('--gamma_neg', default=2, type=float,
                         metavar='gamma_neg', help='gamma neg for simplified asl loss')
     parser.add_argument('--loss_dev', default=-1, type=float,
-                                            help='scale factor for loss')                    
+                                            help='scale factor for loss')
+    parser.add_argument('--loss_clip', default=0.0, type=float,
+                                            help='scale factor for clip')  
 
     parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
                         help='number of data loading workers (default: 32)')
@@ -230,6 +237,7 @@ def main_worker(args, logger):
     # criterion
     criterion = models.aslloss.AsymmetricLossOptimized(
         gamma_neg=args.gamma_neg, gamma_pos=args.gamma_pos,
+        clip=args.loss_clip,
         disable_torch_grad_focal_loss=args.dtgfl,
         eps=args.eps,
     )
