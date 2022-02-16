@@ -18,9 +18,13 @@ def get_datasets(args):
                                             RandAugment(),
                                                transforms.ToTensor(),
                                                normalize]
-    if args.cutout:
-        print("Using Cutout!!!")
-        train_data_transform_list.insert(1, SLCutoutPIL(n_holes=args.n_holes, length=args.length))
+    try:
+        # for q2l_infer scripts
+        if args.cutout:
+            print("Using Cutout!!!")
+            train_data_transform_list.insert(1, SLCutoutPIL(n_holes=args.n_holes, length=args.length))
+    except Exception as e:
+        Warning(e)
     train_data_transform = transforms.Compose(train_data_transform_list)
 
     test_data_transform = transforms.Compose([
