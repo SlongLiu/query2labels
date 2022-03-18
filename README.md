@@ -78,14 +78,14 @@ main_mlc.py \
 
 # Pretrianed Models
 ## Download pretrained models.
-|  Modelname   | mAP | link(Tsinghua-cloud)  | 
-|  ----  | ----  | ---- | 
-| Q2L-R101-448  | 84.9 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
-| Q2L-R101-576  | 86.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
-| Q2L-TResL-448  | 87.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
-| Q2L-TResL_22k-448  | 89.2 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
-| Q2L-SwinL-384  | 90.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
-| Q2L-CvT_w24-384  | 91.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |
+|  Modelname   | mAP | link(Tsinghua-cloud)  | link(Google drive)  | 
+|  ----  | ----  | ---- | ---- | 
+| Q2L-R101-448  | 84.9 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) | [link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
+| Q2L-R101-576  | 86.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |[link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
+| Q2L-TResL-448  | 87.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |[link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
+| Q2L-TResL_22k-448  | 89.2 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |[link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
+| Q2L-SwinL-384  | 90.5 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |[link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
+| Q2L-CvT_w24-384  | 91.3 | [model](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/), [log](https://cloud.tsinghua.edu.cn/d/a1560cd327dc45d0ad8e/?p=%2FQ2L-logs&mode=list) |[link](https://drive.google.com/drive/folders/1_hu98VQ4zZ6F65OvhJzTbp2W3sqaLywP?usp=sharing) |
 
 ## Test pretrained models
 ```sh
